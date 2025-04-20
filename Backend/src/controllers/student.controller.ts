@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { createTeacherSchema, updateTeacherSchema } from "../utils/validators";
+import { createStudentSchema, updateStudentSchema } from "../utils/validators";
 import { HttpStatusCode, UserTypes } from "../utils/constants";
 import { generate } from "generate-password";
 import User from "../models/user.model";
@@ -15,40 +15,40 @@ const {
     HTTP_NOT_FOUND,
 } = HttpStatusCode;
 
-const createTeacher = async (req: Request, res: Response, next: NextFunction) => {
+const createStudent = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { value, error } = createTeacherSchema.validate(req.body);
+        const { value, error } = createStudentSchema.validate(req.body);
         if (error) {
             res.status(HTTP_BAD_REQUEST.code).json({ message: error.details[0].message });
             return;
         }
-        const alreadyTeacher = await User.findOne({ email: value.email });
-        if (alreadyTeacher) {
+        const alreadyStudent = await User.findOne({ email: value.email });
+        if (alreadyStudent) {
             res.status(HTTP_BAD_REQUEST.code).json({ message: "Email already exists" });
             return;
         }
-        const teacherPassword = generate({
+        const studentPassword = generate({
             length: 6,
             numbers: true,
             uppercase: true,
             lowercase: true,
         });
-        const newTeacher = await User.create({
+        const newStudent = await User.create({
             name: value.name,
             email: value.email,
-            password: await hash(teacherPassword, await genSalt(10)),
+            password: await hash(studentPassword, await genSalt(10)),
             phone: value.phone,
-            userType: UserTypes.TEACHER,
+            userType: UserTypes.STUDENT,
             department: value.department,
         });
         sendMail({
-            content: `Your password is ${teacherPassword}`,
-            subject: "Teacher Registration",
+            content: `Your password is ${studentPassword}`,
+            subject: "Student Registration",
             to: value.email,
         });
         res.status(HTTP_CREATED.code).json({
-            message: "Teacher created successfully",
-            teacher: newTeacher,
+            message: "Student created successfully",
+            student: newStudent,
         });
         return;
     }
@@ -57,12 +57,12 @@ const createTeacher = async (req: Request, res: Response, next: NextFunction) =>
     }
 }
 
-const listTeachers = async (req: Request, res: Response, next: NextFunction) => {
+const listStudents = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const teachers = await User.find({ userType: UserTypes.TEACHER }).select("-password -__v");
+        const students = await User.find({ userType: UserTypes.STUDENT }).select("-password -__v");
         res.status(HTTP_OK.code).json({
             message: HTTP_OK.message,
-            teachers,
+            students,
         });
     }
     catch (err) {
@@ -70,21 +70,21 @@ const listTeachers = async (req: Request, res: Response, next: NextFunction) => 
     }
 }
 
-const getTeacher = async (req: Request, res: Response, next: NextFunction) => {
+const getStudent = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params;
         if (!isValidObjectId(id)) {
-            res.status(HTTP_BAD_REQUEST.code).json({ message: "Invalid teacher id" });
+            res.status(HTTP_BAD_REQUEST.code).json({ message: "Invalid student id" });
             return;
         }
-        const teacher = await User.findOne({ _id: id, userType: UserTypes.TEACHER }).select("-password -__v");
-        if (!teacher) {
+        const student = await User.findOne({ _id: id, userType: UserTypes.STUDENT }).select("-password -__v");
+        if (!student) {
             res.status(HTTP_NOT_FOUND.code).json({ message: HTTP_NOT_FOUND.message });
             return;
         }
         res.status(HTTP_OK.code).json({
             message: HTTP_OK.message,
-            teacher,
+            student,
         });
     }
     catch (err) {
@@ -92,31 +92,31 @@ const getTeacher = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 
-const updateTeacher = async (req: Request, res: Response, next: NextFunction) => {
+const updateStudent = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params;
-        const { value, error } = updateTeacherSchema.validate(req.body);
+        const { value, error } = updateStudentSchema.validate(req.body);
         if (error) {
             res.status(HTTP_BAD_REQUEST.code).json({ message: error.details[0].message });
             return;
         }
         if (!isValidObjectId(id)) {
-            res.status(HTTP_BAD_REQUEST.code).json({ message: "Invalid teacher id" });
+            res.status(HTTP_BAD_REQUEST.code).json({ message: "Invalid student id" });
             return;
         }
-        const teacher = await User.findOneAndUpdate({ _id: id, userType: UserTypes.TEACHER }, {
+        const student = await User.findOneAndUpdate({ _id: id, userType: UserTypes.STUDENT }, {
             name: value.name,
             email: value.email,
             phone: value.phone,
             department: value.department,
         }, { new: true }).select("-password -__v");
-        if (!teacher) {
+        if (!student) {
             res.status(HTTP_NOT_FOUND.code).json({ message: HTTP_NOT_FOUND.message });
             return;
         }
         res.status(HTTP_OK.code).json({
             message: HTTP_OK.message,
-            teacher,
+            student,
         });
 
     }
@@ -125,15 +125,15 @@ const updateTeacher = async (req: Request, res: Response, next: NextFunction) =>
     }
 }
 
-const deleteTeacher = async (req: Request, res: Response, next: NextFunction) => {
+const deleteStudent = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params;
         if (!isValidObjectId(id)) {
-            res.status(HTTP_BAD_REQUEST.code).json({ message: "Invalid teacher id" });
+            res.status(HTTP_BAD_REQUEST.code).json({ message: "Invalid student id" });
             return;
         }
-        const teacher = await User.findOneAndDelete({_id: id, userType: UserTypes.TEACHER});
-        if (!teacher) {
+        const student = await User.findOneAndDelete({_id: id, userType: UserTypes.STUDENT});
+        if (!student) {
             res.status(HTTP_NOT_FOUND.code).json({ message: HTTP_NOT_FOUND.message });
             return;
         }
@@ -145,9 +145,9 @@ const deleteTeacher = async (req: Request, res: Response, next: NextFunction) =>
 }
 
 export {
-    createTeacher,
-    listTeachers,
-    getTeacher,
-    updateTeacher,
-    deleteTeacher,
+    createStudent,
+    listStudents,
+    getStudent,
+    updateStudent,
+    deleteStudent,
 }

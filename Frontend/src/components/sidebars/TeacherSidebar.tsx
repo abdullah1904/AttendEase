@@ -2,8 +2,9 @@
 import React from 'react'
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger } from '@/components/ui/sidebar'
 import { BookMarked, CalendarCheck, GraduationCap, LogOut, University } from 'lucide-react'
-import { signOut } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
 import { toast } from 'sonner'
+import { getDepartmentDetails } from '@/utils';
 
 
 const items = [
@@ -30,6 +31,7 @@ const items = [
 ]
 
 const TeacherSidebar = () => {
+  const { data: session } = useSession();
   const handleSignOut = () => {
     signOut()
     toast.success("Logged out successfully")
@@ -65,6 +67,11 @@ const TeacherSidebar = () => {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton>
+              {session?.user.name} ({session?.user.department !== undefined ? getDepartmentDetails(session.user.department) : "Unknown Department"})
+            </SidebarMenuButton>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton onClick={handleSignOut}>
               <LogOut />

@@ -21,7 +21,10 @@ export const authOptions: NextAuthOptions = {
                         return {
                             id: user.user.id,
                             email: user.user.email,
+                            name: user.user.name,
+                            phone: user.user.phone,
                             userType: user.user.userType,
+                            department: user.user.department,
                             access_token: user.user.access_token,
                             refresh_token: user.user.refresh_token,
                         };
@@ -42,6 +45,9 @@ export const authOptions: NextAuthOptions = {
             if (user) {
                 token.id = user.id;
                 token.email = user.email;
+                token.name = user.name;
+                token.phone = user.phone;
+                token.department = user.department;
                 token.userType = user.userType;
                 token.access_token = user.access_token;
                 token.refresh_token = user.refresh_token;
@@ -52,6 +58,9 @@ export const authOptions: NextAuthOptions = {
             if (session.user) {
                 session.user.id = token.id as string;
                 session.user.email = token.email as string;
+                session.user.name = token.name as string;
+                session.user.phone = token.phone as string;
+                session.user.department = token.department as number;
                 session.user.userType = token.userType as number;
                 session.user.access_token = token.access_token as string;
                 session.user.refresh_token = token.refresh_token as string;
@@ -65,7 +74,7 @@ export const authOptions: NextAuthOptions = {
     },
     session: {
         strategy: "jwt",
-        maxAge: 30 * 24 * 60 * 60,
+        maxAge: 1 * 24 * 60 * 60,
     },
     secret: process.env.NEXTAUTH_SECRET
 }

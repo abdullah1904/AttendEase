@@ -2,13 +2,14 @@ import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import User from "../models/user.model";
 import { ACCESS_TOKEN_SECRET } from "../utils/config";
-import { HttpStatusCode } from "../utils/constants";
+import { HttpStatusCode, UserTypes } from "../utils/constants";
 
 const {
-    HTTP_UNAUTHORIZED
+    HTTP_UNAUTHORIZED,
+    HTTP_FORBIDDEN
 } = HttpStatusCode;
 
-const authorize = async (req: Request, res: Response, next: NextFunction) => {
+const authenticate = async (req: Request, res: Response, next: NextFunction) => {
     try {
         let token;
         if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
@@ -41,4 +42,12 @@ const authorize = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 
-export { authorize };
+const adminAuthorize = async (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user || req.user.userType !== UserTypes.ADMIN) {
+        res.status(HTTP_FORBIDDEN.code).json({ message: HTTP_FORBIDDEN.message });
+        return;
+    }
+    next();
+}
+
+export { authenticate, adminAuthorize };

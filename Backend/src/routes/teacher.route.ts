@@ -1,9 +1,12 @@
 import { Router } from "express";
-import { listTeachers } from "../controllers/teacher.controller";
-import { authorize } from "../middlewares/auth.middleware";
+import { createTeacher, deleteTeacher, getTeacher, listTeachers, updateTeacher } from "../controllers/teacher.controller";
 
 const teacherRouter = Router();
 
-teacherRouter.get("/", authorize, listTeachers);
+teacherRouter.post("/", createTeacher);
+teacherRouter.get("/", listTeachers);
+teacherRouter.get("/:id", getTeacher);
+teacherRouter.put("/:id", updateTeacher);
+teacherRouter.delete("/:id", deleteTeacher);
 
 export default teacherRouter;

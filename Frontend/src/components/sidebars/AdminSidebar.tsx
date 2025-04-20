@@ -13,8 +13,9 @@ import {
     SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { BookMarked, GraduationCap, LogOut, Presentation, University } from "lucide-react";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { toast } from "sonner";
+import { getDepartmentDetails } from "@/utils";
 
 const items = [
     {
@@ -40,7 +41,8 @@ const items = [
 ];
 
 const AdminSidebar = () => {
-    const handleSignOut = ()=>{
+    const { data: session } = useSession();
+    const handleSignOut = () => {
         signOut();
         toast.success("Logged out successfully");
     }
@@ -74,6 +76,11 @@ const AdminSidebar = () => {
             </SidebarContent>
             <SidebarFooter>
                 <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton>
+                            {session?.user.name} ({session?.user.department !== undefined ? getDepartmentDetails(session.user.department) : ""})
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
                     <SidebarMenuItem>
                         <SidebarMenuButton onClick={handleSignOut}>
                             <LogOut />

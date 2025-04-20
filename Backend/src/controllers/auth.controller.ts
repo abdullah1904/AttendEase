@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { authSchema } from "../utils/validators";
-import { HttpStatusCode, UserTypes } from "../utils/constants";
+import { changePasswordSchema, signInSchema, signUpSchema } from "../utils/validators";
+import { HttpStatusCode, UniversityDepartments, UserTypes } from "../utils/constants";
 import User from "../models/user.model";
 import { compare, genSalt, hash } from "bcrypt";
 import { generateToken } from "../utils";
@@ -14,7 +14,7 @@ const {
 
 const signUp = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { value, error } = authSchema.validate(req.body);
+        const { value, error } = signUpSchema.validate(req.body);
         if (error) {
             res.status(HTTP_BAD_REQUEST.code).json({ error: error.details[0].message });
             return;
@@ -25,21 +25,21 @@ const signUp = async (req: Request, res: Response, next: NextFunction) => {
             return;
         }
         const newUser = await User.create({
+            name: value.name,
             email: value.email,
             password: await hash(value.password, await genSalt(10)),
+            phone: value.phone,
             userType: UserTypes.ADMIN,
+            department: UniversityDepartments.Admin,
         });
         res.status(HTTP_CREATED.code).json({
             message: "User created successfully",
             user: {
-                id: newUser._id,
-                email: newUser.email,
-                userType: newUser.userType,
+                ...newUser.toObject(),
                 access_token: generateToken({ id: newUser._id }, 'ACCESS'),
                 refresh_token: generateToken({ id: newUser._id }, 'REFRESH'),
             },
         });
-        return;
     }
     catch (err) {
         next(err);
@@ -48,7 +48,7 @@ const signUp = async (req: Request, res: Response, next: NextFunction) => {
 
 const signIn = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { value, error } = authSchema.validate(req.body);
+        const { value, error } = signInSchema.validate(req.body);
         if (error) {
             res.status(HTTP_BAD_REQUEST.code).json({ error: error.details[0].message });
             return;
@@ -66,9 +66,7 @@ const signIn = async (req: Request, res: Response, next: NextFunction) => {
         res.status(HTTP_OK.code).json({
             message: "User logged in successfully",
             user: {
-                id: user._id,
-                email: user.email,
-                userType: user.userType,
+                ...user.toObject(),
                 access_token: generateToken({ id: user._id }, 'ACCESS'),
                 refresh_token: generateToken({ id: user._id }, 'REFRESH'),
             },
@@ -79,4 +77,36 @@ const signIn = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 
-export { signUp, signIn };
+const changePassword = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const userId = req.user?._id;
+        const { value, error } = changePasswordSchema.validate(req.body);
+        if (error) {
+            res.status(HTTP_BAD_REQUEST.code).json({ error: error.details[0].message });
+            return;
+        }
+        const user = await User.findById(userId);
+        if (!user) {
+            res.status(HTTP_NOT_FOUND.code).json({ error: "User not found" });
+            return;
+        }
+        const isMatch = await compare(value.oldPassword, user.password);
+        if (!isMatch) {
+            res.status(HTTP_BAD_REQUEST.code).json({ error: "Invalid credentials" });
+            return;
+        }
+        await User.findByIdAndUpdate(userId, {
+            password: await hash(value.newPassword, await genSalt(10)),
+        });
+        res.status(HTTP_OK.code).json({ message: "Password changed successfully" });
+    }
+    catch (err) {
+        next(err);
+    }
+}
+
+export { 
+    signUp, 
+    signIn,
+    changePassword
+};
