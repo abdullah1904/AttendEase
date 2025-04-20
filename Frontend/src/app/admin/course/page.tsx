@@ -1,0 +1,27 @@
+import CoursesTable from '@/components/tables/CoursesTable'
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb'
+import { courses } from '@/types/course'
+import React from 'react'
+
+const AdminCoursesPage = () => {
+  return (
+    <div>
+      <div className='p-2'>
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">Admin</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Students</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
+      <CoursesTable courses={courses} />
+    </div>
+  )
+}
+
+export default AdminCoursesPage
