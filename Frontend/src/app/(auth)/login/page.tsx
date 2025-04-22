@@ -95,7 +95,7 @@ const LoginPage = () => {
             <CardFooter className='flex justify-end'>
               <Button type='submit'>
                 {isLoading ?
-                  <Loader2 className='animate-spin' />
+                  <Loader2 className='w-4 h-4 animate-spin' />
                   :
                   <>
                     <LogIn />

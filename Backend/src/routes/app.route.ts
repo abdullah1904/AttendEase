@@ -7,7 +7,7 @@ import studentRouter from "./student.route";
 const appRouter = Router();
 
 appRouter.use("/auth", authRouter);
-appRouter.use("/teacher", authenticate, teacherRouter);
-appRouter.use("/student", authenticate, studentRouter);
+appRouter.use("/teachers", authenticate, teacherRouter);
+appRouter.use("/students", authenticate, studentRouter);
 
 export default appRouter;

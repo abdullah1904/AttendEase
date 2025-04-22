@@ -37,7 +37,7 @@ const TeacherSidebar = () => {
     toast.success("Logged out successfully")
   }
   return (
-    <Sidebar className='relative'>
+    <Sidebar className='fixed top-0 left-0 h-screen w-64 border-r bg-white z-50'>
       <SidebarTrigger className="absolute top-4 right-4 z-50 bg-white p-2 rounded-md shadow md:hidden" />
 
       <SidebarHeader>

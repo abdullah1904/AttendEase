@@ -21,6 +21,7 @@ const StudentFormModal = ({ selected, setSelected, setShowModal, showModal }: Pr
         defaultValues: {
             name: selected ? selected.name : "",
             email: selected ? selected.email : "",
+            department: selected ? selected.department : "",
             phone: selected ? selected.phone : ""
         },
         resolver: zodResolver(studentSchema)
@@ -64,11 +65,25 @@ const StudentFormModal = ({ selected, setSelected, setShowModal, showModal }: Pr
                             <FormField
                                 control={form.control}
                                 name="email"
+                                disabled={!!selected}
                                 render={({ field }) => (
                                     <FormItem>
                                         <Label htmlFor="email">Email</Label>
                                         <FormControl>
                                             <Input id="email" type="email" placeholder="Email" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="department"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <Label htmlFor="department">Department</Label>
+                                        <FormControl>
+                                            <Input id="department" placeholder="Department" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

@@ -2,26 +2,51 @@
 import { Student } from '@/types/student'
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { CirclePlus, Pencil, Trash } from 'lucide-react'
+import { CirclePlus, Loader2, Pencil, Trash } from 'lucide-react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import StudentFormModal from '../modals/StudentFormModal';
+import { useSession } from 'next-auth/react';
+import { UserTypes } from '@/utils/constants';
+import { useStudentDeleteMutation, useStudentsListQuery } from '@/hooks/student-api';
+import { toast } from 'sonner';
+import { getDepartmentDetails } from '@/utils';
 
-type Props = {
-    students: Student[]
-}
-
-const StudentsTable = ({ students }: Props) => {
-    const [isAdmin] = useState(true);
+const StudentsTable = () => {
+    const { data: session } = useSession();
     const [showModal, setShowModal] = useState(false);
     const [selected, setSelected] = useState<Student | null>(null);
-    const [studentsData, setStudentsData] = useState<Student[]>(students);
+    const deleteStudentMutation = useStudentDeleteMutation();
 
-    const handleDelete = (id: string) => {
-        setStudentsData(studentsData.filter(student => student.id !== id));
+    const {
+        data: studentsData,
+        isLoading,
+        isError,
+        error,
+    } = useStudentsListQuery();
+
+    const handleDelete = (student: Student) => {
+        setSelected(student);
+        deleteStudentMutation.mutate(student._id, {
+            onSuccess: () => {
+                setSelected(null);
+                toast.success("Teacher deleted successfully!");
+            },
+            onError: (error) => {
+                setSelected(null);
+                toast.error("Error deleting teacher: " + error.message);
+            }
+        });
     }
     const handleEdit = (student: Student) => {
         setSelected(student);
         setShowModal(true);
+    }
+    if (isError) {
+        return (
+            <div className='w-full flex justify-center items-center'>
+                <p className='text-red-500'>Error: {error.message}</p>
+            </div>
+        )
     }
     return (
         <div className='p-2'>
@@ -32,41 +57,52 @@ const StudentsTable = ({ students }: Props) => {
                     Create Student
                 </Button>
             </div>
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead className="w-[100px]">Name</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Phone</TableHead>
-                        <TableHead>Overall Attendance</TableHead>
-                        {isAdmin &&
-                            <TableHead>Actions</TableHead>
-                        }
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {studentsData && studentsData.map((student) => (
-                        <TableRow key={student.id}>
-                            <TableCell className="font-medium">{student.name}</TableCell>
-                            <TableCell>{student.email}</TableCell>
-                            <TableCell>{student.phone}</TableCell>
-                            <TableCell>{student.overallAttendance}</TableCell>
-                            {isAdmin &&
-                                <TableCell className="flex gap-2">
-                                    <Pencil
-                                        className='w-6 h-6 cursor-pointer'
-                                        onClick={() => handleEdit(student)}
-                                    />
-                                    <Trash
-                                        className='w-6 h-6 cursor-pointer text-red-500'
-                                        onClick={() => handleDelete(student.id)}
-                                    />
-                                </TableCell>
+            {isLoading ? (
+                <div className='w-full flex justify-center items-center'>
+                    <Loader2 className='size-16 animate-spin' />
+                </div>
+            ) : (
+
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead className="w-[100px]">Name</TableHead>
+                            <TableHead>Email</TableHead>
+                            <TableHead>Phone</TableHead>
+                            <TableHead>Department</TableHead>
+                            {session?.user.userType === UserTypes.ADMIN &&
+                                <TableHead>Actions</TableHead>
                             }
                         </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
+                    </TableHeader>
+                    <TableBody>
+                        {studentsData && studentsData.map((student) => (
+                            <TableRow key={student._id}>
+                                <TableCell className="font-medium">{student.name}</TableCell>
+                                <TableCell>{student.email}</TableCell>
+                                <TableCell>{student.phone}</TableCell>
+                                <TableCell>{getDepartmentDetails(student.department)}</TableCell>
+                                {session?.user.userType == UserTypes.ADMIN &&
+                                    <TableCell className="flex gap-2">
+                                        <Pencil
+                                            className='w-6 h-6 cursor-pointer'
+                                            onClick={() => handleEdit(student)}
+                                        />
+                                        {deleteStudentMutation.isPending && selected?._id === student._id ? (
+                                            <Loader2 className='size-6 animate-spin' />
+                                        ) : (
+                                            <Trash
+                                                className='size-6 cursor-pointer text-red-500'
+                                                onClick={() => handleDelete(student)}
+                                            />
+                                        )}
+                                    </TableCell>
+                                }
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            )}
             {showModal && (
                 <StudentFormModal
                     showModal={showModal}

@@ -3,12 +3,16 @@ import { Dialog, DialogHeader } from '../ui/dialog'
 import { DialogContent, DialogTitle, DialogFooter } from '../ui/dialog';
 import { Teacher, TeacherFormValues, teacherSchema } from '@/types/teacher';
 import { Button } from '../ui/button';
-import { CirclePlus, Pencil } from 'lucide-react';
+import { CirclePlus, Loader2, Pencil } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '../ui/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { departmentOptions } from '@/utils';
+import { useTeacherCreateMutation, useTeacherUpdateMutation } from '@/hooks/teacher-api';
+import { toast } from 'sonner';
 
 type Props = {
     showModal: boolean
@@ -18,11 +22,13 @@ type Props = {
 }
 
 const TeacherFormModal = ({ showModal, setShowModal, selected, setSelected }: Props) => {
+    const createTeacherMutation = useTeacherCreateMutation();
+    const updateTeacherMutation = useTeacherUpdateMutation();
     const form = useForm<TeacherFormValues>({
         defaultValues: {
             name: selected ? selected.name : "",
             email: selected ? selected.email : "",
-            department: selected ? selected.department : "",
+            department: selected ? String(selected.department) : "",
             phone: selected ? selected.phone : ""
         },
         resolver: zodResolver(teacherSchema)
@@ -32,13 +38,26 @@ const TeacherFormModal = ({ showModal, setShowModal, selected, setSelected }: Pr
         setShowModal(false);
     }
     const onSubmit = (data: TeacherFormValues) => {
-        console.log(data);
-        if (selected) {
-            // Update teacher logic here
-        } else {
-            // Create teacher logic here
+        const teachersData = {
+            ...data,
+            department: Number(data.department),
         }
-        handleClose();
+        console.log(teachersData);
+        if (selected) {
+            updateTeacherMutation.mutate({ teacherId: selected._id, teacher: teachersData }, {
+                onSuccess: () => {
+                    handleClose();
+                    toast.success("Teacher updated successfully!");
+                },
+            });
+        } else {
+            createTeacherMutation.mutate(teachersData, {
+                onSuccess: () => {
+                    handleClose();
+                    toast.success("Teacher created successfully!");
+                },
+            });
+        }
     }
     return (
         <Dialog open={showModal} onOpenChange={handleClose}>
@@ -66,6 +85,7 @@ const TeacherFormModal = ({ showModal, setShowModal, selected, setSelected }: Pr
                             <FormField
                                 control={form.control}
                                 name="email"
+                                disabled={!!selected}
                                 render={({ field }) => (
                                     <FormItem>
                                         <Label htmlFor="email">Email</Label>
@@ -84,7 +104,21 @@ const TeacherFormModal = ({ showModal, setShowModal, selected, setSelected }: Pr
                                     <FormItem>
                                         <Label htmlFor="department">Department</Label>
                                         <FormControl>
-                                            <Input id="department" placeholder="Department" {...field} />
+                                            <Select
+                                                value={String(field.value)}
+                                                onValueChange={field.onChange}
+                                            >
+                                                <SelectTrigger className='w-full'>
+                                                    <SelectValue placeholder="Select Department" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {departmentOptions.map((dept) => (
+                                                        <SelectItem key={dept.value} value={String(dept.value)}>
+                                                            {dept.label}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -108,9 +142,20 @@ const TeacherFormModal = ({ showModal, setShowModal, selected, setSelected }: Pr
 
                         <DialogFooter>
                             <Button type="submit">
-                                {selected ? <Pencil className="mr-2 h-4 w-4" /> : <CirclePlus className="mr-2 h-4 w-4" />}
-                                {selected ? 'Update' : 'Create'}
+                                {createTeacherMutation.isPending ? (
+                                    <Loader2 className="size-6 animate-spin" />
+                                ) : (
+                                    <>
+                                        {selected ? (
+                                            <Pencil className="mr-2 size-4" />
+                                        ) : (
+                                            <CirclePlus className="mr-2 h-4 w-4" />
+                                        )}
+                                        {selected ? 'Update' : 'Create'}
+                                    </>
+                                )}
                             </Button>
+
                         </DialogFooter>
                     </form>
                 </DialogContent>

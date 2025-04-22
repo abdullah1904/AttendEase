@@ -1,6 +1,5 @@
 import React from 'react'
 import TeachersTable from '@/components/tables/TeachersTable'
-import { teachers } from '@/types/teacher';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 
 const AdminTeachersPage = () => {
@@ -19,7 +18,7 @@ const AdminTeachersPage = () => {
           </BreadcrumbList>
         </Breadcrumb>
       </div>
-      <TeachersTable teachers={teachers} />
+      <TeachersTable />
     </div>
   )
 }
