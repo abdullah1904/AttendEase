@@ -1,6 +1,5 @@
 import StudentsTable from '@/components/tables/StudentsTable'
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb'
-import { students } from '@/types/student'
 import React from 'react'
 
 
@@ -20,7 +19,7 @@ const AdminStudentsPage = () => {
           </BreadcrumbList>
         </Breadcrumb>
       </div>
-      <StudentsTable students={students} />
+      <StudentsTable />
     </div>
   )
 }

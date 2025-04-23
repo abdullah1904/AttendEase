@@ -1,5 +1,5 @@
 import { generateRequest } from "@/lib/api-client";
-import { ListTeachersResponse, Teacher } from "@/types/teacher";
+import { Teacher } from "@/types/teacher";
 
 
 export const createTeacher = async (teacher: Omit<Teacher, "_id">) => {
@@ -15,7 +15,7 @@ export const listTeachers = async () => {
     const response = await generateRequest({
         method: "GET",
         url: "/teachers",
-    }) as ListTeachersResponse;
+    });
     return response.teachers;
 }
 

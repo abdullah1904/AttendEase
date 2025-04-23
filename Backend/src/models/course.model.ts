@@ -39,5 +39,7 @@ const CourseSchema = new Schema<ICourse>({
     },
 });
 
+CourseSchema.index({ department: 1, session: 1, section: 1 }, { unique: true });
+
 const Course = model<ICourse>("Course", CourseSchema);
 export default Course;

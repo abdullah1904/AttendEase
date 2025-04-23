@@ -16,8 +16,3 @@ export const teacherSchema = z.object({
 });
 
 export type TeacherFormValues = z.infer<typeof teacherSchema>
-
-export interface ListTeachersResponse {
-    teachers: Teacher[];
-    message: string;
-}

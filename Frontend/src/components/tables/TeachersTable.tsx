@@ -8,7 +8,7 @@ import TeacherFormModal from '../modals/TeacherFormModal';
 import { useSession } from 'next-auth/react';
 import { UserTypes } from '@/utils/constants';
 import { getDepartmentDetails } from '@/utils';
-import { useTeacherListQuery, useTeacherDeleteMutation } from '@/hooks/teacher-api';
+import { useTeacherListQuery, useTeacherDeleteMutation } from '@/hooks/use-teacher';
 import { toast } from 'sonner';
 
 const TeachersTable = () => {
@@ -76,7 +76,7 @@ const TeachersTable = () => {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {teachersData && teachersData.map((teacher) => (
+                        {teachersData && teachersData.map((teacher:Teacher) => (
                             <TableRow key={teacher._id}>
                                 <TableCell className="font-medium">{teacher.name}</TableCell>
                                 <TableCell>{teacher.email}</TableCell>

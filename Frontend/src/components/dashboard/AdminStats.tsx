@@ -1,23 +1,42 @@
-
-import { BookMarked, GraduationCap, Presentation } from "lucide-react"
+"use client";
+import { BookMarked, GraduationCap, Loader2, Presentation } from "lucide-react"
 import { Card, CardContent, CardHeader } from "../ui/card"
 import DashboardChart from "./DashboardChart"
-
-
-const chart1Data = [
-    { count: 200, fill: "var(--color-safari)" },
-]
-
-const chart2Data = [
-    { count: 1200, fill: "var(--color-safari)" },
-]
-
-const chart3Data = [
-    { count: 50, fill: "var(--color-safari)" },
-]
+import { useStatsAdminQuery } from "@/hooks/use-stats"
 
 
 const AdminStats = () => {
+    const {
+        data,
+        isLoading,
+        isError,
+        error,
+    } = useStatsAdminQuery();
+    if (isLoading) {
+        return (
+            <div className="w-full flex justify-center items-center">
+                <Loader2 className="size-16 animate-spin" />
+            </div>
+        );
+    }
+    if (isError || !data) {
+        return (
+            <div className='w-full flex justify-center items-center'>
+                <p className='text-red-500'>Error: {error?.message}</p>
+            </div>
+        )
+    }
+    const chart1Data = [
+        { count: data.teachersCount ?? 0, fill: "var(--color-safari)" },
+    ]
+
+    const chart2Data = [
+        { count: data.studentsCount ?? 0, fill: "var(--color-safari)" },
+    ]
+
+    const chart3Data = [
+        { count: data.coursesCount ?? 0, fill: "var(--color-safari)" },
+    ]
     return (
         <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 justify-evenly">
             <Card>

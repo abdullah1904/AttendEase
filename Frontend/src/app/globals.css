@@ -121,3 +121,12 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Hide scrollbar initially */
+.hide-scrollbar::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
+.hide-scrollbar {
+  scrollbar-width: none;
+}

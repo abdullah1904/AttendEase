@@ -1,6 +1,5 @@
 import CoursesTable from '@/components/tables/CoursesTable'
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb'
-import { courses } from '@/types/course'
 import React from 'react'
 
 const AdminCoursesPage = () => {
@@ -19,7 +18,7 @@ const AdminCoursesPage = () => {
           </BreadcrumbList>
         </Breadcrumb>
       </div>
-      <CoursesTable courses={courses} />
+      <CoursesTable />
     </div>
   )
 }

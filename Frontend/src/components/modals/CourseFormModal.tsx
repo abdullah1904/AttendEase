@@ -1,76 +1,50 @@
+import { Course, CourseFormValues, courseSchema } from '@/types/course'
+import { zodResolver } from '@hookform/resolvers/zod'
 import React from 'react'
-import { Dialog, DialogHeader } from '../ui/dialog'
-import { DialogContent, DialogTitle, DialogFooter } from '../ui/dialog';
-import { Teacher, TeacherFormValues, teacherSchema } from '@/types/teacher';
-import { Button } from '../ui/button';
-import { CirclePlus, Loader2, Pencil } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Label } from '../ui/label';
-import { Input } from '../ui/input';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '../ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { departmentOptions } from '@/utils';
-import { useTeacherCreateMutation, useTeacherUpdateMutation } from '@/hooks/use-teacher';
-import { toast } from 'sonner';
+import { useForm } from 'react-hook-form'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog'
+import { Form, FormControl, FormField, FormItem, FormMessage } from '../ui/form'
+import { Input } from '../ui/input'
+import { Label } from '../ui/label'
+import { CirclePlus, Loader2, Pencil } from 'lucide-react'
+import { Button } from '../ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
+import { departmentOptions } from '@/utils'
 
 type Props = {
     showModal: boolean
     setShowModal: (showModal: boolean) => void
-    selected: Teacher | null
-    setSelected: (selected: Teacher | null) => void
+    selected: Course | null
+    setSelected: (selected: Course | null) => void
 }
 
-const TeacherFormModal = ({ showModal, setShowModal, selected, setSelected }: Props) => {
-    const createTeacherMutation = useTeacherCreateMutation();
-    const updateTeacherMutation = useTeacherUpdateMutation();
-    const form = useForm<TeacherFormValues>({
+const CourseFormModal = ({ selected, setSelected, setShowModal, showModal }: Props) => {
+    const form = useForm<CourseFormValues>({
         defaultValues: {
             name: selected ? selected.name : "",
-            email: selected ? selected.email : "",
+            code: selected ? selected.code : "",
+            credits: selected ? selected.credits : undefined,
             department: selected ? String(selected.department) : "",
-            phone: selected ? selected.phone : ""
+            session: selected ? selected.session : "",
+            section: selected ? selected.section : "",
+            // instructor: selected ? selected.instructor : "",
         },
-        resolver: zodResolver(teacherSchema)
+        resolver: zodResolver(courseSchema)
     });
     const handleClose = () => {
         setSelected(null);
         setShowModal(false);
     }
-    const onSubmit = (data: TeacherFormValues) => {
-        const teacherData = {
-            ...data,
-            department: Number(data.department),
-        }
-        if (selected) {
-            updateTeacherMutation.mutate({ teacherId: selected._id, teacher: teacherData }, {
-                onSuccess: () => {
-                    handleClose();
-                    toast.success("Teacher updated successfully!");
-                },
-                onError: (error)=>{
-                    toast.error("Error updating teacher: " + error.message);
-                }
-            });
-        } else {
-            createTeacherMutation.mutate(teacherData, {
-                onSuccess: () => {
-                    handleClose();
-                    toast.success("Teacher created successfully!");
-                },
-                onError: (error)=>{
-                    toast.error("Error creating teacher: " + error.message);
-                }
-            });
-        }
+    const onSubmit = (data: CourseFormValues) => {
+        console.log(data);
     }
     return (
         <Dialog open={showModal} onOpenChange={handleClose}>
             <Form {...form}>
-                <DialogContent>
+                <DialogContent className='overflow-auto scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-200 hover:scrollbar-thumb-gray-700 hide-scrollbar max-h-[90%]'>
                     <form onSubmit={form.handleSubmit(onSubmit)}>
                         <DialogHeader>
-                            <DialogTitle>{selected ? 'Update' : 'Create'} Teacher</DialogTitle>
+                            <DialogTitle>{selected ? 'Update' : 'Create'} Course</DialogTitle>
                         </DialogHeader>
                         <div className='flex flex-col gap-4 my-4'>
                             <FormField
@@ -89,13 +63,28 @@ const TeacherFormModal = ({ showModal, setShowModal, selected, setSelected }: Pr
 
                             <FormField
                                 control={form.control}
-                                name="email"
+                                name="code"
                                 disabled={!!selected}
                                 render={({ field }) => (
                                     <FormItem>
-                                        <Label htmlFor="email">Email</Label>
+                                        <Label htmlFor="code">Code</Label>
                                         <FormControl>
-                                            <Input id="email" type="email" placeholder="Email" {...field} />
+                                            <Input id="code" type="text" placeholder="Code (i.e. CS305)" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="credits"
+                                disabled={!!selected}
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <Label htmlFor="credits">Credits</Label>
+                                        <FormControl>
+                                            <Input id="credits" type="text" placeholder="Credits" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -129,25 +118,39 @@ const TeacherFormModal = ({ showModal, setShowModal, selected, setSelected }: Pr
                                     </FormItem>
                                 )}
                             />
-
-                            <FormField
-                                control={form.control}
-                                name="phone"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <Label htmlFor="phone">Phone</Label>
-                                        <FormControl>
-                                            <Input id="phone" placeholder="Phone" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                            <div className='grid grid-cols-2 gap-4'>
+                                <FormField
+                                    control={form.control}
+                                    name="session"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <Label htmlFor="session">Session</Label>
+                                            <FormControl>
+                                                <Input id="session" type="text" placeholder="Session (i.e. 2022-2026)" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="section"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <Label htmlFor="section">Section</Label>
+                                            <FormControl>
+                                                <Input id="section" type="text" placeholder="Section (i.e. A1)" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
                         </div>
 
                         <DialogFooter>
                             <Button type="submit">
-                                {createTeacherMutation.isPending || updateTeacherMutation.isPending ? (
+                                {false ? (
                                     <Loader2 className="size-6 animate-spin" />
                                 ) : (
                                     <>
@@ -160,7 +163,6 @@ const TeacherFormModal = ({ showModal, setShowModal, selected, setSelected }: Pr
                                     </>
                                 )}
                             </Button>
-
                         </DialogFooter>
                     </form>
                 </DialogContent>
@@ -169,4 +171,4 @@ const TeacherFormModal = ({ showModal, setShowModal, selected, setSelected }: Pr
     )
 }
 
-export default TeacherFormModal
+export default CourseFormModal

@@ -1,106 +1,105 @@
 import Joi from "joi";
-import {isValidObjectId} from "mongoose";
+import { isValidObjectId } from "mongoose";
 
 // Reusable name validation: allows letters, spaces, hyphens, and apostrophes only
 const safeName = Joi.string()
-    .pattern(/^[a-zA-Z\s'-]+$/)
-    .min(3)
-    .max(30)
-    .required()
-    .messages({
-        'string.pattern.base': 'Name can only contain letters, spaces, hyphens, and apostrophes.',
-    });
+  .pattern(/^[a-zA-Z\s'-]+$/)
+  .min(3)
+  .max(30)
+  .required()
+  .messages({
+    'string.pattern.base': 'Name can only contain letters, spaces, hyphens, and apostrophes.',
+  });
 
 // Reusable phone validation: allows digits, optional "+" at the start, 10-15 chars
 const phoneRegex = Joi.string()
-    .pattern(/^\+?[0-9]{10,15}$/)
-    .required()
-    .messages({
-        'string.pattern.base': 'Phone number must be valid (10-15 digits, optional +).',
-    });
+  .pattern(/^\+?[0-9]{10,15}$/)
+  .required()
+  .messages({
+    'string.pattern.base': 'Phone number must be valid (10-15 digits, optional +).',
+  });
 
 // Sign In Schema
 export const signInSchema = Joi.object({
-    email: Joi.string().email().trim().lowercase().required(),
-    password: Joi.string()
-        .min(6)
-        .max(128)
-        .pattern(/^[\w!@#$%^&*()\-_=+{}[\]:;"'<>,.?/|\\]{6,128}$/)
-        .required()
-        .messages({
-            'string.pattern.base': 'Password contains invalid characters.',
-        }),
+  email: Joi.string().email().trim().lowercase().required(),
+  password: Joi.string()
+    .min(6)
+    .max(128)
+    .pattern(/^[\w!@#$%^&*()\-_=+{}[\]:;"'<>,.?/|\\]{6,128}$/)
+    .required()
+    .messages({
+      'string.pattern.base': 'Password contains invalid characters.',
+    }),
 }).strict();
 
 // Sign Up Schema
 export const signUpSchema = Joi.object({
-    name: safeName,
-    email: Joi.string().email().trim().lowercase().required(),
-    password: Joi.string()
-        .min(6)
-        .max(128)
-        .pattern(/^[\w!@#$%^&*()\-_=+{}[\]:;"'<>,.?/|\\]{6,128}$/)
-        .required()
-        .messages({
-            'string.pattern.base': 'Password contains invalid characters.',
-        }),
-    phone: phoneRegex,
+  name: safeName,
+  email: Joi.string().email().trim().lowercase().required(),
+  password: Joi.string()
+    .min(6)
+    .max(128)
+    .pattern(/^[\w!@#$%^&*()\-_=+{}[\]:;"'<>,.?/|\\]{6,128}$/)
+    .required()
+    .messages({
+      'string.pattern.base': 'Password contains invalid characters.',
+    }),
+  phone: phoneRegex,
 }).strict();
 
 // Change Password Schema
 export const changePasswordSchema = Joi.object({
-    oldPassword: Joi.string()
-        .min(6)
-        .max(128)
-        .pattern(/^[\w!@#$%^&*()\-_=+{}[\]:;"'<>,.?/|\\]{6,128}$/)
-        .required()
-        .messages({
-            'string.pattern.base': 'Password contains invalid characters.',
-        }),
-    newPassword: Joi.string()
-        .min(6)
-        .max(128)
-        .pattern(/^[\w!@#$%^&*()\-_=+{}[\]:;"'<>,.?/|\\]{6,128}$/)
-        .required()
-        .messages({
-            'string.pattern.base': 'Password contains invalid characters.',
-        }),
+  oldPassword: Joi.string()
+    .min(6)
+    .max(128)
+    .pattern(/^[\w!@#$%^&*()\-_=+{}[\]:;"'<>,.?/|\\]{6,128}$/)
+    .required()
+    .messages({
+      'string.pattern.base': 'Password contains invalid characters.',
+    }),
+  newPassword: Joi.string()
+    .min(6)
+    .max(128)
+    .pattern(/^[\w!@#$%^&*()\-_=+{}[\]:;"'<>,.?/|\\]{6,128}$/)
+    .required()
+    .messages({
+      'string.pattern.base': 'Password contains invalid characters.',
+    }),
 }).strict();
 
 // Create Teacher Schema
 export const createTeacherSchema = Joi.object({
-    name: safeName,
-    email: Joi.string().email().trim().lowercase().required(),
-    phone: phoneRegex,
-    department: Joi.number().integer().min(1).max(24).required(),
+  name: safeName,
+  email: Joi.string().email().trim().lowercase().required(),
+  phone: phoneRegex,
+  department: Joi.number().integer().min(1).max(24).required(),
 }).strict();
 
 // Update Teacher Schema
 export const updateTeacherSchema = Joi.object({
-    name: safeName,
-    phone: phoneRegex,
-    department: Joi.number().integer().min(1).max(24).required(),
+  name: safeName,
+  phone: phoneRegex,
+  department: Joi.number().integer().min(1).max(24).required(),
 }).strict();
 
 // Create Student Schema
 export const createStudentSchema = Joi.object({
-    name: safeName,
-    email: Joi.string().email().trim().lowercase().required(),
-    phone: phoneRegex,
-    department: Joi.number().integer().min(1).max(24).required(),
+  name: safeName,
+  email: Joi.string().email().trim().lowercase().required(),
+  phone: phoneRegex,
+  department: Joi.number().integer().min(1).max(24).required(),
 }).strict();
 
 // Update Student Schema
 export const updateStudentSchema = Joi.object({
-    name: safeName,
-    phone: phoneRegex,
-    department: Joi.number().integer().min(1).max(24).required(),
+  name: safeName,
+  phone: phoneRegex,
+  department: Joi.number().integer().min(1).max(24).required(),
 }).strict();
 
 // Create Course Schema
-export const courseSchema = Joi.object({
-  name: Joi.string().min(3).max(100).trim().required(),
-
+export const createCourseSchema = Joi.object({
+  name: safeName,
   code: Joi.string()
     .alphanum()
     .min(4)
@@ -112,9 +111,7 @@ export const courseSchema = Joi.object({
     }),
 
   credits: Joi.number().min(1).max(6).required(),
-
   department: Joi.number().integer().min(1).max(24).required(),
-
   session: Joi.string()
     .trim()
     .required()
@@ -122,15 +119,11 @@ export const courseSchema = Joi.object({
     .messages({
       "string.pattern.base": "Session must be in 'YYYY-YYYY' format.",
     }),
-
   section: Joi.string()
     .trim()
     .uppercase()
-    .min(1)
-    .max(3)
-    .regex(/^[A-Z]{1,3}$/)
+    .regex(/^[A-Z][0-9]$/)
     .required(),
-
   instructor: Joi.string()
     .required()
     .custom((value, helpers) => {
@@ -142,7 +135,6 @@ export const courseSchema = Joi.object({
     .messages({
       "any.invalid": "Instructor must be a valid id.",
     }),
-
   students: Joi.array()
     .items(
       Joi.string().custom((value, helpers) => {

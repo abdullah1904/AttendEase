@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import StudentFormModal from '../modals/StudentFormModal';
 import { useSession } from 'next-auth/react';
 import { UserTypes } from '@/utils/constants';
-import { useStudentDeleteMutation, useStudentsListQuery } from '@/hooks/student-api';
+import { useStudentDeleteMutation, useStudentsListQuery } from '@/hooks/use-student';
 import { toast } from 'sonner';
 import { getDepartmentDetails } from '@/utils';
 
@@ -29,11 +29,11 @@ const StudentsTable = () => {
         deleteStudentMutation.mutate(student._id, {
             onSuccess: () => {
                 setSelected(null);
-                toast.success("Teacher deleted successfully!");
+                toast.success("Student deleted successfully!");
             },
             onError: (error) => {
                 setSelected(null);
-                toast.error("Error deleting teacher: " + error.message);
+                toast.error("Error deleting student: " + error.message);
             }
         });
     }
@@ -68,20 +68,20 @@ const StudentsTable = () => {
                         <TableRow>
                             <TableHead className="w-[100px]">Name</TableHead>
                             <TableHead>Email</TableHead>
-                            <TableHead>Phone</TableHead>
                             <TableHead>Department</TableHead>
+                            <TableHead>Phone</TableHead>
                             {session?.user.userType === UserTypes.ADMIN &&
                                 <TableHead>Actions</TableHead>
                             }
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {studentsData && studentsData.map((student) => (
+                        {studentsData && studentsData.map((student:Student) => (
                             <TableRow key={student._id}>
                                 <TableCell className="font-medium">{student.name}</TableCell>
                                 <TableCell>{student.email}</TableCell>
-                                <TableCell>{student.phone}</TableCell>
                                 <TableCell>{getDepartmentDetails(student.department)}</TableCell>
+                                <TableCell>{student.phone}</TableCell>
                                 {session?.user.userType == UserTypes.ADMIN &&
                                     <TableCell className="flex gap-2">
                                         <Pencil

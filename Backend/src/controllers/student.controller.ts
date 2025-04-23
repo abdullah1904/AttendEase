@@ -24,7 +24,7 @@ const createStudent = async (req: Request, res: Response, next: NextFunction) =>
         }
         const alreadyStudent = await User.findOne({ email: value.email });
         if (alreadyStudent) {
-            res.status(HTTP_BAD_REQUEST.code).json({ message: "Email already exists" });
+            res.status(HTTP_BAD_REQUEST.code).json({ error: "Email already exists" });
             return;
         }
         const studentPassword = generate({
@@ -74,12 +74,12 @@ const getStudent = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params;
         if (!isValidObjectId(id)) {
-            res.status(HTTP_BAD_REQUEST.code).json({ message: "Invalid student id" });
+            res.status(HTTP_BAD_REQUEST.code).json({ error: "Invalid student id" });
             return;
         }
         const student = await User.findOne({ _id: id, userType: UserTypes.STUDENT }).select("-password -__v");
         if (!student) {
-            res.status(HTTP_NOT_FOUND.code).json({ message: HTTP_NOT_FOUND.message });
+            res.status(HTTP_NOT_FOUND.code).json({ error: HTTP_NOT_FOUND.message });
             return;
         }
         res.status(HTTP_OK.code).json({
@@ -101,7 +101,7 @@ const updateStudent = async (req: Request, res: Response, next: NextFunction) =>
             return;
         }
         if (!isValidObjectId(id)) {
-            res.status(HTTP_BAD_REQUEST.code).json({ message: "Invalid student id" });
+            res.status(HTTP_BAD_REQUEST.code).json({ error: "Invalid student id" });
             return;
         }
         const student = await User.findOneAndUpdate({ _id: id, userType: UserTypes.STUDENT }, {
@@ -111,7 +111,7 @@ const updateStudent = async (req: Request, res: Response, next: NextFunction) =>
             department: value.department,
         }, { new: true }).select("-password -__v");
         if (!student) {
-            res.status(HTTP_NOT_FOUND.code).json({ message: HTTP_NOT_FOUND.message });
+            res.status(HTTP_NOT_FOUND.code).json({ error: HTTP_NOT_FOUND.message });
             return;
         }
         res.status(HTTP_OK.code).json({
@@ -129,12 +129,12 @@ const deleteStudent = async (req: Request, res: Response, next: NextFunction) =>
     try {
         const { id } = req.params;
         if (!isValidObjectId(id)) {
-            res.status(HTTP_BAD_REQUEST.code).json({ message: "Invalid student id" });
+            res.status(HTTP_BAD_REQUEST.code).json({ error: "Invalid student id" });
             return;
         }
         const student = await User.findOneAndDelete({_id: id, userType: UserTypes.STUDENT});
         if (!student) {
-            res.status(HTTP_NOT_FOUND.code).json({ message: HTTP_NOT_FOUND.message });
+            res.status(HTTP_NOT_FOUND.code).json({ error: HTTP_NOT_FOUND.message });
             return;
         }
         res.status(HTTP_NO_CONTENT.code).send();

@@ -7,7 +7,11 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '../ui/form'
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
-import { CirclePlus, Pencil } from 'lucide-react'
+import { CirclePlus, Loader2, Pencil } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
+import { departmentOptions } from '@/utils'
+import { useStudentCreateMutation, useStudentUpdateMutation } from '@/hooks/use-student'
+import { toast } from 'sonner'
 
 type Props = {
     showModal: boolean
@@ -17,11 +21,13 @@ type Props = {
 }
 
 const StudentFormModal = ({ selected, setSelected, setShowModal, showModal }: Props) => {
+    const createStudentMutation = useStudentCreateMutation();
+    const updateStudentMutation = useStudentUpdateMutation();
     const form = useForm<StudentFormValues>({
         defaultValues: {
             name: selected ? selected.name : "",
             email: selected ? selected.email : "",
-            department: selected ? selected.department : "",
+            department: selected ? String(selected.department) : "",
             phone: selected ? selected.phone : ""
         },
         resolver: zodResolver(studentSchema)
@@ -31,13 +37,31 @@ const StudentFormModal = ({ selected, setSelected, setShowModal, showModal }: Pr
         setShowModal(false);
     }
     const onSubmit = (data: StudentFormValues) => {
-        console.log(data);
-        if (selected) {
-            // Update teacher logic here
-        } else {
-            // Create teacher logic here
+        const studentData = {
+            ...data,
+            department: Number(data.department),
         }
-        handleClose();
+        if (selected) {
+            updateStudentMutation.mutate({ studentId: selected._id, student: studentData }, {
+                onSuccess: () => {
+                    handleClose();
+                    toast.success("Student updated successfully!");
+                },
+                onError: (error) => {
+                    toast.error("Error updating student: " + error.message);
+                }
+            });
+        } else {
+            createStudentMutation.mutate(studentData, {
+                onSuccess: () => {
+                    handleClose();
+                    toast.success("Student created successfully!");
+                },
+                onError: (error) => {
+                    toast.error("Error creating student: " + error.message);
+                }
+            });
+        }
     }
     return (
         <Dialog open={showModal} onOpenChange={handleClose}>
@@ -45,7 +69,7 @@ const StudentFormModal = ({ selected, setSelected, setShowModal, showModal }: Pr
                 <DialogContent>
                     <form onSubmit={form.handleSubmit(onSubmit)}>
                         <DialogHeader>
-                            <DialogTitle>{selected ? 'Update' : 'Create'} Teacher</DialogTitle>
+                            <DialogTitle>{selected ? 'Update' : 'Create'} Student</DialogTitle>
                         </DialogHeader>
                         <div className='flex flex-col gap-4 my-4'>
                             <FormField
@@ -76,6 +100,7 @@ const StudentFormModal = ({ selected, setSelected, setShowModal, showModal }: Pr
                                     </FormItem>
                                 )}
                             />
+
                             <FormField
                                 control={form.control}
                                 name="department"
@@ -83,7 +108,21 @@ const StudentFormModal = ({ selected, setSelected, setShowModal, showModal }: Pr
                                     <FormItem>
                                         <Label htmlFor="department">Department</Label>
                                         <FormControl>
-                                            <Input id="department" placeholder="Department" {...field} />
+                                            <Select
+                                                value={String(field.value)}
+                                                onValueChange={field.onChange}
+                                            >
+                                                <SelectTrigger className='w-full'>
+                                                    <SelectValue placeholder="Select Department" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {departmentOptions.map((dept) => (
+                                                        <SelectItem key={dept.value} value={String(dept.value)}>
+                                                            {dept.label}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -107,8 +146,18 @@ const StudentFormModal = ({ selected, setSelected, setShowModal, showModal }: Pr
 
                         <DialogFooter>
                             <Button type="submit">
-                                {selected ? <Pencil className="mr-2 h-4 w-4" /> : <CirclePlus className="mr-2 h-4 w-4" />}
-                                {selected ? 'Update' : 'Create'}
+                                {createStudentMutation.isPending || updateStudentMutation.isPending ? (
+                                    <Loader2 className="size-6 animate-spin" />
+                                ) : (
+                                    <>
+                                        {selected ? (
+                                            <Pencil className="mr-2 size-4" />
+                                        ) : (
+                                            <CirclePlus className="mr-2 h-4 w-4" />
+                                        )}
+                                        {selected ? 'Update' : 'Create'}
+                                    </>
+                                )}
                             </Button>
                         </DialogFooter>
                     </form>

@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { createTeacher, deleteTeacher, getTeacher, listTeachers, updateTeacher } from "../controllers/teacher.controller";
+import { adminAuthorize } from "../middlewares/auth.middleware";
 
 const teacherRouter = Router();
 
