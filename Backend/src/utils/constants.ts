@@ -295,8 +295,16 @@ enum UniversityDepartments {
   EnvironmentalScience = 24
 }
 
+enum AttendanceStatus {
+  PRESENT = 1,
+  ABSENT = 2,
+  EXCUSED = 3,
+  LATE = 4,
+}
+
 export {
   HttpStatusCode,
   UserTypes,
   UniversityDepartments,
+  AttendanceStatus,
 };

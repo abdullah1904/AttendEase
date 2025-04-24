@@ -145,7 +145,7 @@ const StudentFormModal = ({ selected, setSelected, setShowModal, showModal }: Pr
                         </div>
 
                         <DialogFooter>
-                            <Button type="submit">
+                            <Button type="submit" disabled={createStudentMutation.isPending || updateStudentMutation.isPending}>
                                 {createStudentMutation.isPending || updateStudentMutation.isPending ? (
                                     <Loader2 className="size-6 animate-spin" />
                                 ) : (

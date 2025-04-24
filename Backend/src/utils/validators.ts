@@ -97,8 +97,8 @@ export const updateStudentSchema = Joi.object({
   department: Joi.number().integer().min(1).max(24).required(),
 }).strict();
 
-// Create Course Schema
-export const createCourseSchema = Joi.object({
+// Create and Update Course Schema
+export const createUpdateCourseSchema = Joi.object({
   name: safeName,
   code: Joi.string()
     .alphanum()
@@ -144,7 +144,9 @@ export const createCourseSchema = Joi.object({
         return value;
       }, "ObjectId validation")
     )
+    .max(30)
     .messages({
       "any.invalid": "Each student id must be a valid id.",
+      "array.max": "You can select up to 30 students only.",
     }),
 }).strict();

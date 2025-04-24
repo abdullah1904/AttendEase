@@ -47,7 +47,7 @@ const generateRequest = async ({ method, url, data, isFormData }: GenerateReques
     }
 
     catch (error: unknown) {
-        console.error("API Error:", error);
+        console.log("API Error:", error);
 
         if (isAxiosError(error) && error.response) {
             const statusCode = error.response.status;

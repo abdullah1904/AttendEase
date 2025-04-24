@@ -6,6 +6,7 @@ import User from "../models/user.model";
 import { genSalt, hash } from "bcrypt";
 import { sendMail } from "../utils";
 import { isValidObjectId } from "mongoose";
+import Course from "../models/course.model";
 
 const {
     HTTP_OK,
@@ -130,6 +131,11 @@ const deleteTeacher = async (req: Request, res: Response, next: NextFunction) =>
         const { id } = req.params;
         if (!isValidObjectId(id)) {
             res.status(HTTP_BAD_REQUEST.code).json({ message: "Invalid teacher id" });
+            return;
+        }
+        const isInstructor = await Course.findOne({ instructor: id });
+        if (isInstructor) {
+            res.status(HTTP_BAD_REQUEST.code).json({ message: "Teacher is instructing a course" });
             return;
         }
         const teacher = await User.findOneAndDelete({_id: id, userType: UserTypes.TEACHER});

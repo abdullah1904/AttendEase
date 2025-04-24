@@ -23,8 +23,15 @@ export const courseSchema = z.object({
         .regex(/^[A-Z]{2,4}[0-9]{2,4}$/, {
             message: "Course code must be like 'CS101' or 'MATH202'.",
         }),
-    credits: z.number().min(1).max(6),
-    department: z.string().min(1,{ message: "Department is required." }),
+    credits: z
+        .string()
+        .refine((val) => {
+            const num = Number(val);
+            return !isNaN(num) && num >= 1 && num <= 6;
+        }, {
+            message: "Credits must be a number between 1 and 6",
+        }),
+    department: z.string().min(1, { message: "Department is required." }),
     session: z
         .string()
         .trim()
@@ -39,138 +46,12 @@ export const courseSchema = z.object({
             message: "Section must be like 'A1', 'B2', etc.",
         }),
     instructor: z.string().regex(/^[0-9a-fA-F]{24}$/, { message: "Must be a valid ObjectId" }),
-    students: z.array(z.string().regex(/^[0-9a-fA-F]{24}$/, { message: "Must be a valid ObjectId" })),
+    students: z
+        .array(
+            z.string().regex(/^[0-9a-fA-F]{24}$/, { message: "Must be a valid ObjectId" })
+        )
+        .max(30, { message: "You can select up to 30 students only." }),
+
 });
 
 export type CourseFormValues = z.infer<typeof courseSchema>
-
-export const dummyCourses: Course[] = [
-    {
-        _id: "c1",
-        name: "Introduction to Artificial Intelligence",
-        code: "CS401",
-        credits: 3,
-        department: 1,
-        session: "2022-2026",
-        section: "B",
-        instructor: {
-            _id: "t1",
-            name: "Dr. Sarah Khan",
-            email: "sarah.khan@university.edu",
-            phone: "+92-300-1234567",
-            department: 1
-        },
-        students: [
-            {
-                _id: "s1",
-                name: "Ahmed Raza",
-                email: "ahmed.raza@student.edu",
-                phone: "+92-300-1234567",
-                department: 1
-            },
-            {
-                _id: "s2",
-                name: "Fatima Noor",
-                email: "fatima.noor@student.edu",
-                phone: "+92-300-1234567",
-                department: 1
-            }
-        ]
-    },
-    {
-        _id: "c2",
-        name: "Database Systems",
-        code: "CS303",
-        credits: 3,
-        department: 1,
-        session: "2022-2026",
-        section: "A",
-        instructor: {
-            _id: "t2",
-            name: "Prof. Imran Latif",
-            email: "imran.latif@university.edu",
-            phone: "+92-300-7654321",
-            department: 1
-        },
-        students: [
-            {
-                _id: "s3",
-                name: "Ali Usman",
-                email: "ali.usman@student.edu",
-                department: 1,
-                phone: "+92-300-1234567",
-            },
-            {
-                _id: "s4",
-                name: "Mehwish Tariq",
-                email: "mehwish.tariq@student.edu",
-                phone: "+92-300-1234567",
-                department: 1
-            }
-        ]
-    },
-    {
-        _id: "c3",
-        name: "Software Engineering",
-        code: "CS305",
-        credits: 3,
-        department: 1,
-        session: "2022-2026",
-        section: "C",
-        instructor: {
-            _id: "t3",
-            name: "Dr. Ayesha Rehman",
-            email: "ayesha.rehman@university.edu",
-            phone: "+92-301-1112233",
-            department: 1
-        },
-        students: [
-            {
-                _id: "s5",
-                name: "Usman Javed",
-                email: "usman.javed@student.edu",
-                phone: "+92-300-1234567",
-                department: 1
-            },
-            {
-                _id: "s6",
-                name: "Hina Asif",
-                email: "hina.asif@student.edu",
-                phone: "+92-300-1234567",
-                department: 1
-            }
-        ]
-    },
-    {
-        _id: "c4",
-        name: "Operating Systems",
-        code: "CS307",
-        credits: 4,
-        department: 1,
-        session: "2022-2026",
-        section: "D",
-        instructor: {
-            _id: "t4",
-            name: "Mr. Bilal Ahmed",
-            email: "bilal.ahmed@university.edu",
-            phone: "+92-302-9876543",
-            department: 1
-        },
-        students: [
-            {
-                _id: "s7",
-                name: "Nida Hussain",
-                email: "nida.hussain@student.edu",
-                phone: "+92-300-1234567",
-                department: 1
-            },
-            {
-                _id: "s8",
-                name: "Hassan Rafiq",
-                email: "hassan.rafiq@student.edu",
-                phone: "+92-300-1234567",
-                department: 1
-            }
-        ]
-    }
-];

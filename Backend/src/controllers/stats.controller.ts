@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import User from "../models/user.model"
 import { HttpStatusCode, UserTypes } from "../utils/constants"
+import Course from "../models/course.model";
 
 const {
     HTTP_OK,
@@ -10,11 +11,12 @@ const adminStats = async (req:Request,res:Response, next:NextFunction)=>{
     try{
         const studentsCountPromise = User.find({userType: UserTypes.STUDENT}).countDocuments();
         const teachersCountPromise = User.find({userType: UserTypes.TEACHER}).countDocuments();
-        const [studentsCount, teachersCount] = await Promise.all([studentsCountPromise, teachersCountPromise]);
+        const coursesCountPromise = Course.find({}).countDocuments()
+        const [studentsCount, teachersCount, coursesCount] = await Promise.all([studentsCountPromise, teachersCountPromise, coursesCountPromise]);
         const stats = {
             studentsCount,
             teachersCount,
-            coursesCount: 0,
+            coursesCount,
         }
         res.status(HTTP_OK.code).json({
             message: HTTP_OK.message,
