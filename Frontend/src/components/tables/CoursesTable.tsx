@@ -53,11 +53,13 @@ const CoursesTable = () => {
     return (
         <div className='p-2'>
             <div className='flex justify-between'>
-                <h2 className='text-xl'>Students</h2>
-                <Button className='cursor-pointer' onClick={() => setShowModal(true)}>
-                    <CirclePlus />
-                    Create Course
-                </Button>
+                <h2 className='text-xl'>Courses</h2>
+                {session?.user.userType === UserTypes.ADMIN && (
+                    <Button className='cursor-pointer' onClick={() => setShowModal(true)}>
+                        <CirclePlus />
+                        Create Course
+                    </Button>
+                )}
             </div>
             {isLoading ? (
                 <div className='w-full flex justify-center items-center'>

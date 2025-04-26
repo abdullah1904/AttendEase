@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { createUpdateCourseSchema } from "../utils/validators";
-import { HttpStatusCode } from "../utils/constants";
+import { HttpStatusCode, UserTypes } from "../utils/constants";
 import Course from "../models/course.model";
 import { isValidObjectId } from "mongoose";
 
@@ -50,11 +50,23 @@ const createCourse = async (req: Request, res: Response, next: NextFunction) => 
 
 const listCourses = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const courses = await Course.find({}).select("-__v").populate("instructor", "-__v -password").populate("students", "-__v -password");
-        res.status(HTTP_OK.code).json({
-            message: HTTP_OK.message,
-            courses,
-        });
+        const userType = req.user?.userType;
+        const userId = req.user?._id;
+        if(userType === UserTypes.ADMIN){
+
+            const courses = await Course.find({}).select("-__v").populate("instructor", "-__v -password").populate("students", "-__v -password");
+            res.status(HTTP_OK.code).json({
+                message: HTTP_OK.message,
+                courses,
+            });
+        }
+        if(userType === UserTypes.TEACHER){
+            const courses = await Course.find({ instructor: userId }).select("-__v").populate("instructor", "-__v -password").populate("students", "-__v -password");
+            res.status(HTTP_OK.code).json({
+                message: HTTP_OK.message,
+                courses,
+            });
+        }
     }
     catch (err) {
         next(err);
@@ -96,6 +108,7 @@ const updateCourse = async (req: Request, res: Response, next: NextFunction) => 
             return;
         }
         const alreadyCreatedCourse = await Course.findOne({
+            _id: { $ne: id },
             department: value.department,
             session: value.session,
             section: value.section,

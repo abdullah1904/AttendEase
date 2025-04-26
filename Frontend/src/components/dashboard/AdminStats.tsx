@@ -2,7 +2,7 @@
 import { BookMarked, GraduationCap, Loader2, Presentation } from "lucide-react"
 import { Card, CardContent, CardHeader } from "../ui/card"
 import DashboardChart from "./DashboardChart"
-import { useStatsAdminQuery } from "@/hooks/use-stats"
+import { useStatsQuery } from "@/hooks/use-stats"
 
 
 const AdminStats = () => {
@@ -11,7 +11,7 @@ const AdminStats = () => {
         isLoading,
         isError,
         error,
-    } = useStatsAdminQuery();
+    } = useStatsQuery();
     if (isLoading) {
         return (
             <div className="w-full flex justify-center items-center">

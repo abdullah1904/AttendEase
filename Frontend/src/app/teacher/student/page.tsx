@@ -3,14 +3,14 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 import React from 'react'
 
 
-const AdminStudentsPage = () => {
+const TeacherStudentsPage = () => {
   return (
     <div>
       <div className='p-2'>
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/">Admin</BreadcrumbLink>
+              <BreadcrumbLink href="/">Teacher</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
@@ -24,4 +24,4 @@ const AdminStudentsPage = () => {
   )
 }
 
-export default AdminStudentsPage
+export default TeacherStudentsPage

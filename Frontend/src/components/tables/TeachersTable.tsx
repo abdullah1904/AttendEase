@@ -26,8 +26,8 @@ const TeachersTable = () => {
 
     const handleDelete = (teacher: Teacher) => {
         setSelected(teacher);
-        deleteTeacherMutation.mutate(teacher._id,{
-            onSuccess: ()=>{
+        deleteTeacherMutation.mutate(teacher._id, {
+            onSuccess: () => {
                 setSelected(null);
                 toast.success("Teacher deleted successfully!");
             },
@@ -53,10 +53,12 @@ const TeachersTable = () => {
         <div className='p-2'>
             <div className='flex justify-between'>
                 <h2 className='text-xl'>Teachers</h2>
-                <Button onClick={() => setShowModal(true)} className='cursor-pointer'>
-                    <CirclePlus />
-                    Create Teacher
-                </Button>
+                {session?.user.userType === UserTypes.ADMIN && (
+                    <Button onClick={() => setShowModal(true)} className='cursor-pointer'>
+                        <CirclePlus />
+                        Create Teacher
+                    </Button>
+                )}
             </div>
             {isLoading ? (
                 <div className='w-full flex justify-center items-center'>
@@ -76,7 +78,7 @@ const TeachersTable = () => {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {teachersData && teachersData.map((teacher:Teacher) => (
+                        {teachersData && teachersData.map((teacher: Teacher) => (
                             <TableRow key={teacher._id}>
                                 <TableCell className="font-medium">{teacher.name}</TableCell>
                                 <TableCell>{teacher.email}</TableCell>

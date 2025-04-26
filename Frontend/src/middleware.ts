@@ -15,8 +15,12 @@ export default withAuth(
     if (req.nextUrl.pathname === "/") {
       if (userType === 1) {
         return NextResponse.redirect(new URL("/admin", req.url));
-      } else if (userType === 2) {
+      } 
+      else if (userType === 2) {
         return NextResponse.redirect(new URL("/teacher", req.url));
+      }
+      else if(userType === 3){
+        return NextResponse.redirect(new URL("/student", req.url));
       }
     }
 
@@ -27,7 +31,9 @@ export default withAuth(
     if (req.nextUrl.pathname.startsWith("/teacher") && userType !== 2) {
       return NextResponse.redirect(new URL("/", req.url));
     }
-
+    if (req.nextUrl.pathname.startsWith("/student") && userType !== 3) {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
     // Allow if userType matches the route
     return NextResponse.next();
   },

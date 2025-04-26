@@ -1,9 +1,9 @@
-import { getAdminStats } from "@/services/stats-api-client";
+import { getStats } from "@/services/stats-api-client";
 import { useQuery } from "@tanstack/react-query";
 
-export const useStatsAdminQuery = () => {
+export const useStatsQuery = () => {
     return useQuery({
-        queryKey: ['admin-stats'],
-        queryFn: getAdminStats
+        queryKey: ['stats'],
+        queryFn: getStats
     });
 }

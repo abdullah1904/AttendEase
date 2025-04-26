@@ -52,10 +52,12 @@ const StudentsTable = () => {
         <div className='p-2'>
             <div className='flex justify-between'>
                 <h2 className='text-xl'>Students</h2>
-                <Button className='cursor-pointer' onClick={() => setShowModal(true)}>
-                    <CirclePlus />
-                    Create Student
-                </Button>
+                {session?.user.userType === UserTypes.ADMIN && (
+                    <Button className='cursor-pointer' onClick={() => setShowModal(true)}>
+                        <CirclePlus />
+                        Create Student
+                    </Button>
+                )}
             </div>
             {isLoading ? (
                 <div className='w-full flex justify-center items-center'>
@@ -76,7 +78,7 @@ const StudentsTable = () => {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {studentsData && studentsData.map((student:Student) => (
+                        {studentsData && studentsData.map((student: Student) => (
                             <TableRow key={student._id}>
                                 <TableCell className="font-medium">{student.name}</TableCell>
                                 <TableCell>{student.email}</TableCell>

@@ -1,9 +1,9 @@
 import { generateRequest } from "@/lib/api-client";
 
-export const getAdminStats = async () => {
+export const getStats = async () => {
     const response = await generateRequest({
         method: "GET",
-        url: "/stats/admin",
+        url: "/stats",
     });
     return response.data;
 }

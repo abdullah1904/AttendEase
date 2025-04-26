@@ -1,7 +1,7 @@
 "use client";
 import React from 'react'
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger } from '@/components/ui/sidebar'
-import { BookMarked, CalendarCheck, GraduationCap, LogOut, University } from 'lucide-react'
+import { BookMarked, CalendarCheck, LogOut, University } from 'lucide-react'
 import { signOut, useSession } from 'next-auth/react'
 import { toast } from 'sonner'
 import { getDepartmentDetails } from '@/utils';
@@ -13,20 +13,20 @@ const items = [
     url: "/teacher",
     icon: University,
   },
+  // {
+  //   title: "Students",
+  //   url: "/teacher/student",
+  //   icon: GraduationCap,
+  // },
   {
-    title: "Students",
-    url: "/teacher/student",
-    icon: GraduationCap,
+    title: "Courses",
+    url: "/teacher/course",
+    icon: BookMarked,
   },
   {
     title: "Attendance",
     url: "/teacher/attendance",
     icon: CalendarCheck
-  },
-  {
-    title: "Courses",
-    url: "/admin/course",
-    icon: BookMarked,
   },
 ]
 

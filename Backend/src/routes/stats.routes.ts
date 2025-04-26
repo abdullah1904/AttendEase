@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { adminStats } from "../controllers/stats.controller";
+import { getStats } from "../controllers/stats.controller";
 import { adminAuthorize } from "../middlewares/auth.middleware";
 
 const statsRouter = Router();
 
-statsRouter.get("/admin", adminAuthorize, adminStats);
+statsRouter.get("/", getStats);
 
 export default statsRouter;

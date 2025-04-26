@@ -1,17 +1,39 @@
+"use client"
 import React from 'react'
 import { Card, CardContent, CardHeader } from '../ui/card'
-import { BookMarked, GraduationCap } from 'lucide-react'
+import { BookMarked, GraduationCap, Loader2 } from 'lucide-react'
 import DashboardChart from './DashboardChart'
+import { useStatsQuery } from '@/hooks/use-stats'
 
-const chart2Data = [
-    { count: 200, fill: "var(--color-safari)" },
-]
-
-const chart3Data = [
-    { count: 5, fill: "var(--color-safari)" },
-]
 
 const TeacherStats = () => {
+    const {
+        data,
+        isLoading,
+        isError,
+        error,
+    } = useStatsQuery();
+    if (isLoading) {
+        return (
+            <div className="w-full flex justify-center items-center">
+                <Loader2 className="size-16 animate-spin" />
+            </div>
+        );
+    }
+    if (isError || !data) {
+        return (
+            <div className='w-full flex justify-center items-center'>
+                <p className='text-red-500'>Error: {error?.message}</p>
+            </div>
+        )
+    }
+    const chart2Data = [
+        { count: data.studentsCount ?? 0, fill: "var(--color-safari)" },
+    ]
+
+    const chart3Data = [
+        { count: data.coursesCount ?? 0, fill: "var(--color-safari)" },
+    ]
     return (
         <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 justify-evenly">
             <Card>
