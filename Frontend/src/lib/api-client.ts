@@ -9,7 +9,7 @@ const axiosInstance = axios.create({
 });
 
 type GenerateRequestParams<T = unknown> = {
-    method: "GET" | "POST" | "PUT" | "DELETE";
+    method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
     url: string;
     data?: T;
     isFormData?: boolean;
@@ -39,6 +39,9 @@ const generateRequest = async ({ method, url, data, isFormData }: GenerateReques
                 break;
             case "DELETE":
                 response = await axiosInstance.delete(url, customHeaders);
+                break;
+            case "PATCH":
+                response = await axiosInstance.patch(url, data, customHeaders);
                 break;
             default:
                 throw new Error("Invalid method");

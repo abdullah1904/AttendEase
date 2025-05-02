@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react'
 import { Button } from '../ui/button'
-import { CirclePlus, Loader2, Pencil, Trash } from 'lucide-react'
+import { CirclePlus, Info, Loader2, Pencil, Trash } from 'lucide-react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
 import { Course } from '@/types/course';
 import { getDepartmentDetails } from '@/utils';
@@ -10,11 +10,13 @@ import { useSession } from 'next-auth/react';
 import { UserTypes } from '@/utils/constants';
 import { useCourseDeleteMutation, useCoursesListQuery } from '@/hooks/use-course';
 import { toast } from 'sonner';
+import CourseDetailModal from '../modals/CourseDetailModal';
 
 
 const CoursesTable = () => {
     const { data: session } = useSession();
     const [showModal, setShowModal] = useState(false);
+    const [showDetailModal, setShowDetailModal] = useState(false);
     const [selected, setSelected] = useState<Course | null>(null);
     const deleteCourseMutation = useCourseDeleteMutation();
 
@@ -25,6 +27,10 @@ const CoursesTable = () => {
         error,
     } = useCoursesListQuery();
 
+    const handleInfo = (course: Course) => {
+        setSelected(course);
+        setShowDetailModal(true);
+    }
     const handleDelete = (course: Course) => {
         setSelected(course);
         deleteCourseMutation.mutate(course._id, {
@@ -89,26 +95,41 @@ const CoursesTable = () => {
                                 <TableCell>{course.session} {course.section}</TableCell>
                                 <TableCell>{course.instructor.name}</TableCell>
                                 <TableCell>{course.students.length}</TableCell>
-                                {session?.user.userType == UserTypes.ADMIN &&
-                                    <TableCell className="flex gap-2">
-                                        <Pencil
-                                            className='size-6 cursor-pointer'
-                                            onClick={() => handleEdit(course)}
-                                        />
-                                        {deleteCourseMutation.isPending && selected?._id === course._id ? (
-                                            <Loader2 className='size-6 animate-spin' />
-                                        ) : (
-                                            <Trash
-                                                className='size-6 cursor-pointer text-red-500'
-                                                onClick={() => handleDelete(course)}
+                                <TableCell className="flex gap-2">
+                                    <Info
+                                        className='size-6 cursor-pointer'
+                                        onClick={()=> handleInfo(course)}
+                                    />
+                                    {session?.user.userType == UserTypes.ADMIN && (
+                                        <>
+
+                                            <Pencil
+                                                className='size-6 cursor-pointer'
+                                                onClick={() => handleEdit(course)}
                                             />
-                                        )}
-                                    </TableCell>
-                                }
+                                            {deleteCourseMutation.isPending && selected?._id === course._id ? (
+                                                <Loader2 className='size-6 animate-spin' />
+                                            ) : (
+                                                <Trash
+                                                    className='size-6 cursor-pointer text-red-500'
+                                                    onClick={() => handleDelete(course)}
+                                                />
+                                            )}
+                                        </>)
+                                    }
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
+            )}
+            {showDetailModal && (
+                <CourseDetailModal
+                    selected={selected}
+                    setSelected={setSelected}
+                    setShowModal={setShowDetailModal}
+                    showModal={showDetailModal}
+                />
             )}
             {showModal && (
                 <CourseFormModal

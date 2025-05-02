@@ -32,7 +32,7 @@ export default function RootLayout({
         <NextAuthSessionProvider>
           <TanStackQueryProvider>
             {children}
-            <Toaster position="bottom-right" toastOptions={{duration: 750}} />
+            <Toaster position="bottom-right" />
           </TanStackQueryProvider>
         </NextAuthSessionProvider>
       </body>

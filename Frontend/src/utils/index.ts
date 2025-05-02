@@ -1,3 +1,4 @@
+
 const getDepartmentDetails = (deptId: number): string => {
     switch (deptId) {
         case 1: return "Administration";
@@ -52,10 +53,23 @@ const departmentOptions = [
     { label: 'Medical Sciences', value: 22 },
     { label: 'Islamic Studies', value: 23 },
     { label: 'Environmental Science', value: 24 }
-  ];
-  
+];
+
+const formatDate = (dateArg: Date): string => {
+    const date = new Date(dateArg); 
+    const options: Intl.DateTimeFormatOptions = {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    };
+    return date.toLocaleDateString('en-US', options);
+};
+
+
+
 
 export {
     getDepartmentDetails,
-    departmentOptions
+    departmentOptions,
+    formatDate,
 }

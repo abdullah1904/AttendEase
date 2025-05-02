@@ -1,5 +1,6 @@
 import Joi from "joi";
 import { isValidObjectId } from "mongoose";
+import { AttendanceStatus } from "./constants";
 
 // Reusable name validation: allows letters, spaces, hyphens, and apostrophes only
 const safeName = Joi.string()
@@ -147,6 +148,50 @@ export const createUpdateCourseSchema = Joi.object({
     .max(30)
     .messages({
       "any.invalid": "Each student id must be a valid id.",
+      "array.max": "You can select up to 30 students only.",
+    }),
+}).strict();
+
+export const createAttendanceSchema = Joi.object({
+  course: Joi.string()
+    .required()
+    .custom((value, helpers) => {
+      if (!isValidObjectId(value)) {
+        return helpers.error("any.invalid");
+      }
+      return value;
+    }, "ObjectId validation")
+    .messages({
+      "any.invalid": "Course must be a valid id.",
+    }),
+  date: Joi.string()
+    .pattern(/^\d{4}-\d{2}-\d{2}$/)
+    .required(),
+  students: Joi.array()
+    .items(
+      Joi.object({
+        student: Joi.string()
+          .required()
+          .custom((value, helpers) => {
+            if (!isValidObjectId(value)) {
+              return helpers.error("any.invalid");
+            }
+            return value;
+          }, "ObjectId validation")
+          .messages({
+            "any.invalid": "Student must be a valid id.",
+          }),
+        status: Joi.number()
+          .min(1)
+          .max(4)
+          .required()
+          .messages({
+            "any.only": `Status must be one of the following: ${Object.values(AttendanceStatus).join(", ")}`,
+          }),
+      })
+    )
+    .max(30)
+    .messages({
       "array.max": "You can select up to 30 students only.",
     }),
 }).strict();

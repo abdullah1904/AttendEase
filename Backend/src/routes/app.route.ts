@@ -5,6 +5,7 @@ import { adminAuthorize, authenticate } from "../middlewares/auth.middleware";
 import studentRouter from "./student.route";
 import statsRouter from "./stats.routes";
 import courseRouter from "./course.route";
+import attendanceRouter from "./attendance.route";
 
 const appRouter = Router();
 
@@ -13,5 +14,6 @@ appRouter.use("/teachers", authenticate, adminAuthorize, teacherRouter);
 appRouter.use("/students", authenticate, studentRouter);
 appRouter.use("/stats", authenticate, statsRouter);
 appRouter.use("/courses", authenticate, courseRouter);
+appRouter.use("/attendance", authenticate, attendanceRouter);
 
 export default appRouter;

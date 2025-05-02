@@ -50,4 +50,12 @@ const adminAuthorize = async (req: Request, res: Response, next: NextFunction) =
     next();
 }
 
-export { authenticate, adminAuthorize };
+const teacherAuthorize = async (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user || req.user.userType !== UserTypes.TEACHER) {
+        res.status(HTTP_FORBIDDEN.code).json({ message: HTTP_FORBIDDEN.message });
+        return;
+    }
+    next();
+}
+
+export { authenticate, adminAuthorize, teacherAuthorize };
