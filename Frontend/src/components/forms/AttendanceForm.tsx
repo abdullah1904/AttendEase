@@ -5,7 +5,7 @@ import { Course } from "@/types/course";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Loader2 } from "lucide-react";
 
 import {
     Form,
@@ -28,11 +28,18 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 import { AttendanceFormValues, attendanceSchema } from "@/types/attendance";
 import { useState } from "react";
+import { MultiSelect } from "../multi-select";
 import { Student } from "@/types/student";
+import { AttendanceStatus } from "@/utils/constants";
+import { useAttendanceCreateMutation } from "@/hooks/use-attendance";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 
 const AttendanceForm = () => {
-    const [selectedCourseStudents, setSelectedCourseStudents] = useState<Student[] | null>(null);
+    const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+    const createAttendanceMutation = useAttendanceCreateMutation();
+    const router = useRouter();
     const form = useForm<AttendanceFormValues>({
         resolver: zodResolver(attendanceSchema),
     });
@@ -46,17 +53,43 @@ const AttendanceForm = () => {
     const handleCourseChange = (courseId: string) => {
         const selectedCourse = coursesData?.find((course: Course) => course._id === courseId);
         if (selectedCourse) {
-            setSelectedCourseStudents(selectedCourse.students);
+            setSelectedCourse(selectedCourse);
         } else {
-            setSelectedCourseStudents(null);
+            setSelectedCourse(null);
         }
     }
 
     const onSubmit = (values: AttendanceFormValues) => {
-        console.log("Submitted Data:", {
-            ...values,
-            date: format(values.date, "yyyy-MM-dd")
-        });
+        const presentStudents = values.students;
+        const absentStudents = selectedCourse?.students.filter((student: Student) => !presentStudents.includes(student._id)).map((student) => student._id) || [];
+        const data = {
+            course: values.course,
+            date: format(values.date, "yyyy-MM-dd"),
+            students: [
+                ...presentStudents.map((student) => ({
+                    student: student,
+                    status: AttendanceStatus.PRESENT,
+                })),
+                ...absentStudents.map((student) => ({
+                    student: student,
+                    status: AttendanceStatus.ABSENT,
+                })),
+            ],
+        }
+        createAttendanceMutation.mutate(data, {
+            onSuccess: () => {
+                router.refresh();
+                router.push("/teacher/attendance");
+                toast.success("Attendance marked successfully!");
+            },
+            onError: (error) => {
+                toast.error("Error creating attendance: " + error.message);
+            },
+
+        })
+
+
+        console.log("Attendance Data: ", data);
     };
 
     if (isError) {
@@ -142,15 +175,38 @@ const AttendanceForm = () => {
                         )}
                     />
                     <div className="col-span-2">
-                        {selectedCourseStudents && selectedCourseStudents.length > 0 && selectedCourseStudents.map((student: Student) => (
-                            <div key={student._id} className="flex items-center justify-between p-2 border-b">
-                                {student.name}
-                            </div>
-                        ))}
+                        <FormField
+                            control={form.control}
+                            name="students"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel htmlFor="students">Students</FormLabel>
+                                    <FormControl>
+                                        <MultiSelect
+                                            options={selectedCourse ? selectedCourse.students.map((student: Student) => ({ label: student.name, value: student._id })) : []}
+                                            disabled={!selectedCourse}
+                                            onValueChange={field.onChange}
+                                            value={field.value}
+                                            placeholder="Select Students"
+                                            defaultValue={selectedCourse ? selectedCourse.students.map((student) => student._id) : []}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
                     </div>
-                </div>
 
-                <Button type="submit">Submit</Button>
+                </div>
+                <div className="w-full flex justify-end mt-4">
+                    <Button type="submit" disabled={createAttendanceMutation.isPending}>
+                        {createAttendanceMutation.isPending ? (
+                            <Loader2 className="size-6 animate-spin" />
+                        ) : (
+                            "Submit"
+                        )}
+                    </Button>
+                </div>
             </form>
         </Form>
     );

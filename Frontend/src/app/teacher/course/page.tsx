@@ -13,7 +13,7 @@ const TeacherCoursesPage = () => {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Students</BreadcrumbPage>
+              <BreadcrumbPage>Courses</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>

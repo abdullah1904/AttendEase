@@ -81,9 +81,7 @@ const CoursesTable = () => {
                             <TableHead>Session/Section</TableHead>
                             <TableHead>Instructor</TableHead>
                             <TableHead>Students</TableHead>
-                            {session?.user.userType == UserTypes.ADMIN &&
-                                <TableHead>Actions</TableHead>
-                            }
+                            <TableHead>Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>

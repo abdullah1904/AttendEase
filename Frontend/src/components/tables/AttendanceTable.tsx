@@ -10,10 +10,13 @@ import { useAttendanceGetQuery } from '@/hooks/use-attendance';
 import { Attendance } from '@/types/attendance';
 import { AttendanceStatus } from '@/utils/constants';
 import { formatDate } from '@/utils';
-import { Loader2 } from 'lucide-react';
+import { Info, Loader2 } from 'lucide-react';
+import AttendanceDetailModal from '../modals/AttendanceDetailModal';
 
 const AttendanceTable = () => {
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [selectedAttendance, setSelectedAttendance] = useState<Attendance | null>(null);
+  const [showModal, setShowModal] = useState(false);
   const {
     data: coursesData,
     isLoading,
@@ -30,6 +33,10 @@ const AttendanceTable = () => {
   const handleSelectChange = (value: string) => {
     const course = coursesData.find((course: Course) => course._id === value);
     setSelectedCourse(course || null);
+  }
+  const handleInfo = (attendance: Attendance) => {
+    setSelectedAttendance(attendance);
+    setShowModal(true);
   }
 
   if (isError || isAttendanceError) {
@@ -76,6 +83,7 @@ const AttendanceTable = () => {
               <TableHead>Total Students</TableHead>
               <TableHead>Present Count</TableHead>
               <TableHead>Absent Count</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -87,6 +95,12 @@ const AttendanceTable = () => {
                 <TableCell>{attendance.students.length}</TableCell>
                 <TableCell>{attendance.students.filter((student) => student.status === AttendanceStatus.PRESENT).length}</TableCell>
                 <TableCell>{attendance.students.filter((student) => student.status === AttendanceStatus.ABSENT).length}</TableCell>
+                <TableCell>
+                  <Info
+                    className='size-6 cursor-pointer'
+                    onClick={() => handleInfo(attendance)}
+                  />
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -95,6 +109,14 @@ const AttendanceTable = () => {
         <div className="w-full flex justify-center items-center">
           <p className="text-gray-500">Please select a course to view attendance data.</p>
         </div>
+      )}
+      {selectedAttendance && (
+        <AttendanceDetailModal
+          selected={selectedAttendance}
+          setSelected={setSelectedAttendance}
+          showModal={showModal}
+          setShowModal={setShowModal}
+        />
       )}
     </>
   );
