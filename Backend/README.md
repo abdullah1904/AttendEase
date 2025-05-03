@@ -1,23 +1,24 @@
-<h1 align="center">AttendEase - Frontend</h1>
-
+<h1 align="center">AttendEase - Backend</h1>
 
 <h2>Environment Variables:</h2>
 <p>To run the project locally, you’ll need to set up the following environment variables:</p>
 
 ```bash
 
-NEXTAUTH_SECRET=
-
-NEXTAUTH_URL=http://localhost:3000
-
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-
-NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+PORT=8000
+NODE_ENV="development"
+DB_URI=""
+ACCESS_TOKEN_SECRET=""
+ACCESS_TOKEN_EXPIRY=""
+REFRESH_TOKEN_SECRET=""
+REFRESH_TOKEN_EXPIRY=""
+MAIL_USER=""
+MAIL_PASS=""
 
 ```
 
 <h2>Project Setup:</h2>
-<p>Follow these steps to set up and run the frontend locally:</p>
+<p>Follow the steps below to set up and run the backend server locally:</p>
 
 ```bash
 
