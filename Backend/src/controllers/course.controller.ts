@@ -3,6 +3,7 @@ import { createUpdateCourseSchema } from "../utils/validators";
 import { HttpStatusCode, UserTypes } from "../utils/constants";
 import Course from "../models/course.model";
 import { isValidObjectId } from "mongoose";
+import Attendance from "../models/attendance.model";
 
 const {
     HTTP_OK,
@@ -146,6 +147,11 @@ const deleteCourse = async (req: Request, res: Response, next: NextFunction) => 
         const { id } = req.params;
         if (!isValidObjectId(id)) {
             res.status(HTTP_BAD_REQUEST.code).json({ error: "Invalid course id" });
+            return;
+        }
+        const hasAttendance = await Attendance.findOne({course: id});
+        if (hasAttendance) {
+            res.status(HTTP_BAD_REQUEST.code).json({ error: "Course has attendance records." });
             return;
         }
         const course = await Course.findByIdAndDelete(id);
